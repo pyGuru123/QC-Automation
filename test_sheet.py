@@ -3,17 +3,13 @@ import pytest
 import logging
 import pandas as pd
 
-from bucketing import BUCKET
 from autologger import Logger
+from config import *
 
-data_file = "sample_data/MILKMAN_SAMPLE_6THFEB.xlsx"
-required_columns = ['First Name', 'Company', 'Phone', 'Email']
-industries = ['dairy','food & beverages']
-FAILED_ROWS = []
 
 ################ LOGGING CONFIG ###################
 
-logger = Logger(data_file)
+logger = Logger(DATA_FILE)
 
 ################ EXTERNAL TESTS ###################
 
@@ -24,7 +20,7 @@ def test_CanLoadBucket():
 @pytest.mark.skip()
 def test_CanReadFile(df):
     # We are able to load file
-    df = pd.read_excel(data_file)
+    df = pd.read_excel(DATA_FILE)
     assert len(df.head(5)) == 5
 
 ################ TESTING CHECKLIST #################
@@ -32,14 +28,16 @@ def test_CanReadFile(df):
 @pytest.fixture()
 def df():
     # Making df available to all tests
-    df = pd.read_excel(data_file)
+    df = pd.read_excel(DATA_FILE)
     return df
 
-def test_CheckSampleLength(df, length=20):
+@pytest.mark.parametrize("length", [(SAMPLE_LENGTH)])
+def test_CheckSampleLength(df, length):
     # Check Number of rows in excel > mentioned in requirements
     assert len(df) >= length
 
-def test_RequiredColumnsNotEmpty(df):
+@pytest.mark.parametrize("required_columns", [(REQUIRED_COLUMNS)])
+def test_RequiredColumnsNotEmpty(df, required_columns):
     # Required Columns not empty
     passed = True
     for column in required_columns:
@@ -52,8 +50,7 @@ def test_RequiredColumnsNotEmpty(df):
     assert passed
 
 def test_NoDuplicateRows(df):
-    # Tests if there'a duplicate values in the df based
-    # on name, phone, email_id
+    # Tests if there'a duplicate values in the df based on name, phone, email_id
 
     passed = True
     duplicated = df[df.duplicated(subset=['First Name','Phone', 'Email'], keep=False)]
@@ -65,7 +62,8 @@ def test_NoDuplicateRows(df):
 
     assert passed
 
-def test_NumberOfEmployessInRange(df, min_emp=4, max_emp=200):
+@pytest.mark.parametrize("min_emp, max_emp", [(MIN_EMP, MAX_EMP)])
+def test_NumberOfEmployessInRange(df, min_emp, max_emp):
     # Tests if the number of employess are in the given range
 
     passed = True
@@ -78,7 +76,8 @@ def test_NumberOfEmployessInRange(df, min_emp=4, max_emp=200):
 
     assert passed
 
-def test_MatchIndustries(df):
+@pytest.mark.parametrize("industries", [(INDUSTRIES)])
+def test_MatchIndustries(df, industries):
     # Tests if the industry column is in allowed industries
 
     passed = True
