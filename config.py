@@ -2,7 +2,10 @@ import os
 from bucketing import BUCKET
 
 # SET EMAIL COLUMN
-email_column = 5
+EMAIL_COLUMN = 5
+
+# MAX COLUMNS
+TOTAL_COLUMNS = 20
 
 # EXCEL FILE LOCATION
 DATA_FILE = "sample_data/MILKMAN_SAMPLE_6THFEB.xlsx"

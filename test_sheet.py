@@ -89,3 +89,35 @@ def test_MatchIndustries(df, industries):
             logger.log(logging.DEBUG, f"{index+2}, {invalid_ind.iloc[i]['Industry']} is not in allowed industries")
 
     assert passed
+
+@pytest.mark.parametrize("total_cols", [(TOTAL_COLUMNS)])
+def test_MaxColumnsFilled(df, total_cols):
+    # Maximum columns are filled with 10% max error
+    passed = True
+    empty_cols = df.isna().sum(axis=1)
+    indices = empty_cols.index.to_list()
+    if indices:
+        passed = False
+        for i in indices:
+            ec = empty_cols[i]
+            perc = (ec / total_cols) * 100
+            if perc > 10:
+                logger.log(logging.DEBUG, f"{i+2}, column fill error rate > 10%, {ec} col value missing")
+
+    assert passed
+
+
+def test_ComapanyEmailMatching(df):
+    # tests if work email domain matching company website
+    passed = True
+    for index, row in df.iterrows():
+        email = str(row['Email']).lower()
+        company = str(row['Company']).lower()
+        website = str(row['Website']).lower()
+
+        company = ''.join(company.split())
+        domain = email.split('@')[1].split('.')[0]
+        if not (domain in company or domain in website):
+            logger.log(logging.DEBUG, f"{index+2}, work email domain not matching company/website")
+
+    assert passed
