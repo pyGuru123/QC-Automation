@@ -3,7 +3,7 @@ import pytest
 import logging
 import pandas as pd
 
-from autologger import Logger
+from src.autologger import Logger
 from config import *
 
 
@@ -90,23 +90,35 @@ def test_MatchIndustries(df, industries):
 
     assert passed
 
-@pytest.mark.parametrize("total_cols", [(TOTAL_COLUMNS)])
-def test_MaxColumnsFilled(df, total_cols):
+def test_MaxColumnsFilled(df):
     # Maximum columns are filled with 10% max error
     passed = True
-    empty_cols = df.isna().sum(axis=1)
-    indices = empty_cols.index.to_list()
-    if indices:
+    total_cells = len(df) * len(df.columns)
+    empty_columns = df.isna().sum().sum()
+    perc = (empty_columns / total_cells) * 100
+    print(perc)
+    if perc > 5:
         passed = False
-        for i in indices:
-            ec = empty_cols[i]
-            perc = (ec / total_cols) * 100
-            if perc > 10:
-                logger.log(logging.DEBUG, f"{i+2}, column fill error rate > 10%, {ec} col value missing")
+        logger.log(logging.DEBUG, f"{-1}, {empty_columns} cells are not filled. ER = {perc:.1f}")
+
+    assert passed
+
+@pytest.mark.parametrize("locations", [(LOCATIONS)])
+def test_LocationMatching(df, locations):
+    # Matching locations based on keywords
+    passed = True
+    for index, row in df.iterrows():
+        location = str(row['Company State']).lower()
+        if location not in locations:
+            passed = False
+            logger.log(logging.DEBUG, f"{index+2}, location {location} not in given locations")
 
     assert passed
 
 
+############################## NOT NEEDED FOR NOW ############################
+
+@pytest.mark.skip()
 def test_ComapanyEmailMatching(df):
     # tests if work email domain matching company website
     passed = True

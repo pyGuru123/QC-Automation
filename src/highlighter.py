@@ -1,6 +1,6 @@
 import openpyxl
 from openpyxl.styles import PatternFill
-from autologger import get_filename
+from src/autologger import get_filename
 
 fill = PatternFill(start_color='FF0000', end_color='FF0000', fill_type='solid')
 
