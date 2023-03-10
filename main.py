@@ -16,7 +16,7 @@ def removeRowsWithEmptyEmails():
 # removeRowsWithEmptyEmails()
 
 # RUNNING TESTS
-subprocess.call(['pytest'])
+subprocess.call(['pytest', 'src/test_sheet.py'])
 
 # FIX LOGS & HIGHLIGHTING
 subprocess.call(['python', 'src/highlighter.py'])
