@@ -1,13 +1,21 @@
+import os
+from pathlib import Path
 import openpyxl
 from openpyxl.styles import PatternFill
-from src/autologger import get_filename
+from autologger import get_filename
 
 fill = PatternFill(start_color='FF0000', end_color='FF0000', fill_type='solid')
 
-data_file = "sample_data/MILKMAN_SAMPLE_6THFEB.xlsx"
-filename = get_filename(data_file)
+parent_dir = os.path.dirname(os.path.abspath(__file__)).strip('src\\')
+test_file = os.path.join(parent_dir, 'setup.txt')
+
+with open(test_file, 'r') as f:
+    data_file = Path(f.readline())
+
+filename = os.path.join(parent_dir, get_filename(data_file))
 workbook = openpyxl.load_workbook(data_file)
-worksheet = workbook.active
+sheets = workbook.sheetnames
+worksheet = workbook[sheets[1]]
 
 ######################### Sorting Log File ############################
 f = open(filename)

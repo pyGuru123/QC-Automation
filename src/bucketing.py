@@ -1,8 +1,8 @@
 import math
 import pandas as pd
 
-bucketing_file = "sample_data/Bucketing.xlsx"
-df = pd.read_excel(bucketing_file)
+bucketing_file = "src\BUCKETING.xlsx"
+df = pd.read_excel(bucketing_file, sheet_name=0)
 BUCKET = {}
 
 def removeNan(column):
@@ -16,7 +16,21 @@ def df_column(column):
 # Adding Columns to BUCKET dictionary
 columns = df.columns
 for column in columns:
-    BUCKET[column] = df_column(df[column])
+    BUCKET[column.lower()] = df_column(df[column])
+
+# Loading Abbreviations
+abbreviations = pd.read_excel(bucketing_file, sheet_name=1)
+abbs = abbreviations.iloc[:, 0].to_list()
+abbs = list(map(lambda x : x.lower(), abbs))
+newBucket = {senior : BUCKET[senior] for senior in BUCKET}
+for senior in BUCKET:
+    for position in BUCKET[senior]:
+        if position.lower() in abbs:
+            index = abbs.index(position.lower())
+            row = df_column(abbreviations.iloc[index])
+            newBucket[senior] = list(set(newBucket[senior] + row))
+            
+BUCKET = newBucket
 
 ########### BUCKET Columns ###########
 # Owner
