@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 import pandas as pd
 from src.bucketing import BUCKET
 
@@ -8,7 +7,7 @@ parent_dir = os.path.dirname(os.path.abspath(__file__)).strip('src\\')
 test_file = os.path.join(parent_dir, 'setup.txt')
 
 with open(test_file, 'r') as f:
-    FILE_PATH = Path(f.readline())
+    FILE_PATH = f.readline()
 
 # with open('setup.txt') as file:
 #     FILE_PATH = file.readline()
