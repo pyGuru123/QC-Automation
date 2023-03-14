@@ -2,57 +2,64 @@ import os
 import pandas as pd
 from src.bucketing import BUCKET
 
-# EXCEL FILE LOCATION
-parent_dir = os.path.dirname(os.path.abspath(__file__)).strip('src\\')
-test_file = os.path.join(parent_dir, 'setup.txt')
-
-with open(test_file, 'r') as f:
-    FILE_PATH = f.readline()
-
-# with open('setup.txt') as file:
-#     FILE_PATH = file.readline()
-
-df = pd.read_excel(FILE_PATH, sheet_name = 0)
-
 def splitByComma(string):
     if str(string) != 'nan':
         return list(map(lambda x : x.strip().lower(), string.split(',')))
     return []
 
-# REQUIRED COLUMNS MATCHING
-REQUIRED_COLUMNS = ['First Name', 'Company', 'Phone No', 'Work Email']
+def get_constraints(temp_file):
+    """Returns all the required constraints from the requirements file"""
 
-# INDUSTRIES
-INDUSTRIES = splitByComma(df.loc[0, 'Industry'])
+    df = pd.read_excel(temp_file, sheet_name = 0)
 
-# LOCATION
-CITY = splitByComma(df.loc[0, 'City'])
-STATE = splitByComma(df.loc[0, 'State'])
-COUNTRY = splitByComma(df.loc[0, 'Country'])
+    # REQUIRED COLUMNS MATCHING
+    REQUIRED_COLUMNS = ['First Name', 'Company', 'Phone No', 'Work Email']
 
-# DESIGNATION & BUCKETS
-DESIGNATION = splitByComma(df.loc[0, 'Designation'])
-DESG_BUCKET = []
-for desg in DESIGNATION:
-    if desg in BUCKET:
-        DESG_BUCKET += BUCKET[desg]
-    else:
-        DESG_BUCKET.append(desg)
-DESG_BUCKET = list(map(lambda x : x.lower(), DESG_BUCKET))
+    # INDUSTRIES
+    INDUSTRIES = splitByComma(df.loc[0, 'Industry'])
 
-# SAMPLE QUANTITY LENGTH
-SAMPLE_LENGTH = int(df.loc[0, 'Quantity'])
+    # LOCATION
+    CITY = splitByComma(df.loc[0, 'City'])
+    STATE = splitByComma(df.loc[0, 'State'])
+    COUNTRY = splitByComma(df.loc[0, 'Country'])
 
-# EMPLOYEES RANGE
-num_emp = df.loc[0, '# Employees']
-if str(num_emp) != 'str':
-    MIN_EMP, MAX_EMP = map(int, num_emp.split('-'))
+    # DESIGNATION & BUCKETS
+    DESIGNATION = splitByComma(df.loc[0, 'Designation'])
+    DESG_BUCKET = []
+    for desg in DESIGNATION:
+        if desg in BUCKET:
+            DESG_BUCKET += BUCKET[desg]
+        else:
+            DESG_BUCKET.append(desg)
+    DESG_BUCKET = list(map(lambda x : x.lower(), DESG_BUCKET))
 
-# ADDITIONAL COLUMNS
-ADDITIONAL_COLUMNS = splitByComma(df.loc[0, 'Additional Columns'])
-ADDITIONAL_COLUMNS = list(map(lambda x : x.lower(), ADDITIONAL_COLUMNS))
+    # SAMPLE QUANTITY LENGTH
+    SAMPLE_LENGTH = int(df.loc[0, 'Quantity'])
 
-df.columns = map(str.lower, df.columns)
-ADDITIONAL_REQ = {}
-for column in ADDITIONAL_COLUMNS:
-    ADDITIONAL_REQ[column] = splitByComma(df.loc[0, column])
+    # EMPLOYEES RANGE
+    num_emp = df.loc[0, '# Employees']
+    if str(num_emp) != 'str':
+        MIN_EMP, MAX_EMP = map(int, num_emp.split('-'))
+
+    # ADDITIONAL COLUMNS
+    ADDITIONAL_COLUMNS = splitByComma(df.loc[0, 'Additional Columns'])
+    ADDITIONAL_COLUMNS = list(map(lambda x : x.lower(), ADDITIONAL_COLUMNS))
+
+    df.columns = map(str.lower, df.columns)
+    ADDITIONAL_REQ = {}
+    for column in ADDITIONAL_COLUMNS:
+        ADDITIONAL_REQ[column] = splitByComma(df.loc[0, column])
+
+    return {
+        "required_columns" : REQUIRED_COLUMNS,
+        "industries" : INDUSTRIES,
+        "city" : CITY,
+        "state" : STATE,
+        "country" : COUNTRY,
+        "desg_bucket" : DESG_BUCKET,
+        "sample_length" : SAMPLE_LENGTH,
+        "min_emp" : MIN_EMP,
+        "max_emp" : MAX_EMP,
+        "additional_columns": ADDITIONAL_COLUMNS,
+        "additional_req" : ADDITIONAL_REQ
+    }

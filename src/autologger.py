@@ -1,12 +1,9 @@
 import os
 import logging
 
-def get_filename(filepath):
-    return os.path.basename(filepath).strip('.xlsx') + '.log'
 
-def Logger(filepath):
-    filename = get_filename(filepath)
 
+def Logger(filename):
     # create logger for "QC Automation"
     logger = logging.getLogger('QC Automation')
     logger.setLevel(logging.DEBUG)
