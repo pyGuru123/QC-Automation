@@ -131,3 +131,4 @@ dmypy.json
 
 # Custom Files Folders
 sample_data/
+frontend/node_modules/
